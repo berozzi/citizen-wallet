@@ -131,3 +131,25 @@ export interface CollectionPoint {
   /** Godziny otwarcia (opis tekstowy — wystarczający dla MVP). */
   hours: string;
 }
+
+/**
+ * Zeskanowany kod kreskowy / QR — wpis w PLIKOWYM dzienniku skanów.
+ * ---------------------------------------------------------------------------
+ * W odróżnieniu od `LoyaltyCard` (które trafiają do AsyncStorage), te wpisy
+ * lądują w prawdziwym pliku na dysku: `barcodes.json` (+ kopia czytelna dla
+ * człowieka `barcodes.txt`) w katalogu dokumentów aplikacji. Dzięki temu kod
+ * można odczytać, skopiować czy zdeserializować poza aplikacją.
+ */
+export interface ScannedBarcode {
+  id: string;
+  /** Surowa treść odczytana ze skanera, np. \"2401234567890\". */
+  value: string;
+  /** Typ kodu zwrócony przez kamerę, np. 'ean13', 'qr', 'code128'. */
+  format: string;
+  /** Skąd pochodzi skan: 'karta' (moduł 1) albo 'kwit' (moduł 3). */
+  source: string;
+  /** Opcjonalna etykieta (np. nazwa sklepu), jeśli była znana w chwili skanu. */
+  label: string | null;
+  /** Moment zeskanowania (timestamp ms). */
+  scannedAt: number;
+}

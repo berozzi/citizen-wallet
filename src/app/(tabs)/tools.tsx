@@ -4,21 +4,23 @@
  * Hub prowadzący do pozostałych modułów aplikacji:
  *  - Eko-zwroty i butelkomaty (moduł 3): skanowanie kwitów,
  *  - Mapa punktów zbiórki (moduł 3): butelkomaty, PSZOK, elektrośmieci,
- *  - Kalendarz Obywatelski (moduł 4): harmonogram wywozu śmieci.
+ *  - Kalendarz Obywatelski (moduł 4): harmonogram wywozu śmieci,
+ *  - Dziennik kodów kreskowych: pliki, do których zapisują się skany.
  *
  * Każdy kafelek pokazuje krótki, dynamiczny status (np. kwota do odebrania),
  * żeby użytkownik od razu wiedział, czy coś go czeka.
  */
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components';
 import { colors, fontSize, fontWeight, radius, shadow, spacing } from '@/theme/colors';
 import { useEco } from '@/store/EcoContext';
 import { useSettings } from '@/store/SettingsContext';
 import { formatCurrency } from '@/utils/dates';
 import { COLLECTION_POINTS } from '@/data/collectionPoints';
+import { readScannedBarcodes } from '@/storage/barcodeFile';
 
 interface ToolCardProps {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -48,6 +50,17 @@ export default function ToolsScreen() {
   const router = useRouter();
   const { pendingValue, bottlesReturned, activeVouchers } = useEco();
   const { settings } = useSettings();
+  const [barcodeCount, setBarcodeCount] = useState(0);
+
+  // Liczba zeskanowanych kodów zapisanych w pliku — odświeżana przy wejściu.
+  useFocusEffect(
+    useCallback(() => {
+      void (async () => {
+        const list = await readScannedBarcodes();
+        setBarcodeCount(list.length);
+      })();
+    }, [])
+  );
 
   return (
     <ScreenContainer>
@@ -90,6 +103,18 @@ export default function ToolsScreen() {
               : 'Harmonogram nieustawiony'
           }
           onPress={() => router.push('/tools/schedule')}
+        />
+
+        <ToolCard
+          icon="barcode-outline"
+          title="Dziennik kodów kreskowych"
+          description="Podglądnij plik z każdym zeskanowanym kodem (JSON i TXT)."
+          badge={
+            barcodeCount > 0
+              ? `${barcodeCount} zapisanych kodów`
+              : 'Plik pusty — zeskanuj kod'
+          }
+          onPress={() => router.push('/tools/barcodes')}
         />
       </ScrollView>
     </ScreenContainer>

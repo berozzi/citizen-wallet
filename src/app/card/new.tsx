@@ -23,6 +23,7 @@ import { BarcodeScanner, BarcodeView, Field, PrimaryButton, ScreenContainer, Scr
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 import { BRANDS, CUSTOM_BRAND_STYLE, findBrand } from '@/data/brands';
 import { useCards } from '@/store/CardsContext';
+import { appendScannedBarcode } from '@/storage/barcodeFile';
 import type { BarcodeFormat } from '@/types';
 
 /** Zamień typ kodu zwrócony przez kamerę na nasz wewnętrzny format. */
@@ -67,6 +68,14 @@ export default function NewCardScreen() {
     setBarcodeValue(data);
     setBarcodeFormat(mapScannedFormat(type));
     setScannerVisible(false);
+    // Każdy zeskanowany kod zapisujemy od razu do pliku (barcodes.json/.txt).
+    // Zapis jest „w tle" (void) — nie blokuje UI, a błąd tylko logujemy.
+    void appendScannedBarcode({
+      value: data,
+      format: type, // surowy typ zwrócony przez kamerę, np. 'ean13' / 'code128'
+      source: 'karta',
+      label: storeName.trim() || null,
+    });
   };
 
   const canSave = barcodeValue.trim().length > 0 && (storeName.trim().length > 0 || name.trim().length > 0);

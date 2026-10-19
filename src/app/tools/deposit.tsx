@@ -27,6 +27,7 @@ import {
   VOUCHER_VALIDITY_MONTHS,
 } from '@/store/EcoContext';
 import { addMonths, daysUntil, formatCurrency, formatDate, startOfToday } from '@/utils/dates';
+import { appendScannedBarcode } from '@/storage/barcodeFile';
 
 export default function DepositScreen() {
   const { vouchers, activeVouchers, pendingValue, bottlesReturned, addVoucher, deleteVoucher } = useEco();
@@ -203,9 +204,16 @@ export default function DepositScreen() {
           </View>
           <View style={styles.scannerWrap}>
             <BarcodeScanner
-              onScanned={(data) => {
+              onScanned={(data, type) => {
                 setCode(data);
                 setScannerVisible(false);
+                // Kod kwitu również trafia do dziennika plikowego.
+                void appendScannedBarcode({
+                  value: data,
+                  format: type,
+                  source: 'kwit',
+                  label: null,
+                });
               }}
               style={styles.scanner}
             />

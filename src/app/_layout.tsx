@@ -56,6 +56,7 @@ export default function RootLayout() {
                 <Stack.Screen name="tools/map" />
                 <Stack.Screen name="tools/schedule" />
                 <Stack.Screen name="tools/deposit" />
+                <Stack.Screen name="tools/barcodes" />
               </Stack>
             </EcoProvider>
           </ReceiptsProvider>
