@@ -11,7 +11,7 @@ import React from 'react';
 import { type ColorValue } from 'react-native';
 import { Tabs } from 'expo-router/js-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, fontSize, fontWeight } from '@/theme/colors';
+import { colors, fonts } from '@/constants/appTheme';
 
 /** Fabryka funkcji renderującej ikonę zakładki (wypełniona, gdy aktywna). */
 function tabIcon(
@@ -35,7 +35,7 @@ function tabIcon(
       <Ionicons
         name={focused ? active : inactive}
         size={size}
-        color={typeof color === 'string' ? color : colors.textSecondary}
+        color={typeof color === 'string' ? color : colors.muted}
       />
     );
   };
@@ -47,14 +47,14 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
+          backgroundColor: colors.card,
+          borderTopColor: colors.line,
         },
         tabBarLabelStyle: {
-          fontSize: fontSize.xs - 1,
-          fontWeight: fontWeight.semibold,
+          fontFamily: fonts.medium,
+          fontSize: 12,
         },
       }}
     >
