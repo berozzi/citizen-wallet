@@ -22,13 +22,17 @@ import { CardsProvider } from '@/store/CardsContext';
 import { ReceiptsProvider } from '@/store/ReceiptsContext';
 import { EcoProvider } from '@/store/EcoContext';
 import { SettingsProvider } from '@/store/SettingsContext';
+import { useAppFonts } from '@/hooks/useAppFonts';
 
 export default function RootLayout() {
+  const ready = useAppFonts();
+  
   useEffect(() => {
     // Jednorazowo, przy starcie: kanał Android + zgoda na powiadomienia.
     void setupNotificationsAsync();
   }, []);
 
+  if (!ready) return null;
   return (
     <SafeAreaProvider>
       <SettingsProvider>

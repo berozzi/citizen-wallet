@@ -1,48 +1,52 @@
 /**
- * SYSTEM PROJEKTOWY (Design System) — Kolory, odstępy, promienie, typografia
+ * SYSTEM PROJEKTOWY — kolory, odstępy, promienie, typografia
  * ---------------------------------------------------------------------------
- * Zgodnie z dokumentacją projektu aplikacja używa jasnego, minimalistycznego motywu:
- *  - Kolor główny: Deep Teal / morski cyjan (#007A78) — nowoczesność, zaufanie, ekologia
- *  - Tło: czysta biel + jasnoszary (#F5F7FA) na kafelki/sekcje (odcinają się od bieli)
- *  - Tekst: głęboki grafit (#1A202C) — bardziej czytelny niż czysta czerń
- *  - Akcent: ciepły pomarańcz (#ED8936) — alerty (gwarancje, wywóz śmieci)
+ * Paleta "Głęboka zieleń + bursztyn", ułożona tak, żeby elementy się nie zlewały:
+ *  - tło ekranów jest chłodną szarością (#E6EBE8), a karty/kafelki są BIAŁE
+ *    z wyraźną ramką — karta zawsze odcina się od tła,
+ *  - kolor główny to ciemna zieleń (#0B5D4E) — biały tekst na niej ma duży kontrast,
+ *  - akcent ostrzegawczy to ciemny bursztyn (czytelny jako tekst), a jasny
+ *    bursztyn (`highlight`) służy tylko do dekoracji.
  *
- * Cała reszta aplikacji importuje kolory WYŁĄCZNIE stąd — dzięki temu
- * przemalowanie apki w jednym miejscu jest trivialne.
+ * UWAGA: `background` i `surface` zamieniły się rolami względem starego motywu:
+ * teraz background = tło ekranu (szare), surface = karta (białe).
+ *
+ * Cała reszta aplikacji importuje kolory WYŁĄCZNIE stąd.
  */
 
 export const colors = {
-  /** Kolor główny (brand) — paski aktywnych zakładek, przyciski, akcenty. */
-  primary: '#007A78',
-  primaryDark: '#005E5C',
-  /** Rozjaśniona wersja primary — tło \"chipów\" i wyróżnień. */
-  primaryTint: '#E1F1F0',
+  /** Kolor główny (brand) — aktywne zakładki, przyciski, akcenty. */
+  primary: '#0B5D4E',
+  primaryDark: '#08463B',
+  /** Rozjaśniona wersja primary — tło „chipów" i wyróżnień. */
+  primaryTint: '#CFEBE3',
 
   /** Tła. */
-  background: '#FFFFFF', // czysta biel — tło ekranów
-  surface: '#F5F7FA', // jasnoszary — tło sekcji i kafelków
+  background: '#E6EBE8', // tło ekranów
+  surface: '#FFFFFF', // karty i kafelki
   surfaceRaised: '#FFFFFF',
 
   /** Tekst. */
-  text: '#1A202C', // grafit — tekst podstawowy
-  textSecondary: '#718096', // szary — tekst pomocniczy (daty, opisy)
+  text: '#14231F',
+  textSecondary: '#4F5F59',
   textOnPrimary: '#FFFFFF',
 
-  /** Linie i obramowania. */
-  border: '#E2E8F0',
+  /** Linie i obramowania (wyraźniejsze niż wcześniej). */
+  border: '#C9D2CE',
 
   /** Akcenty ostrzegawcze i statusy. */
-  accent: '#ED8936', // pomarańcz — ważne alerty (gwarancja, wywóz śmieci)
-  accentTint: '#FEEAD7',
-  success: '#38A169', // zieleń — gwarancja ważna, wszystko OK
-  warning: '#ECC94B', // żółć — gwarancja kończy się za chwilę
-  danger: '#E53E3E', // czerwień — gwarancja wygasła, błędy
+  accent: '#A85400', // ciemny bursztyn — czytelny jako tekst i ikona
+  accentTint: '#FFEFCC',
+  highlight: '#F2B134', // jasny bursztyn — tylko dekoracje (kółka, plakietki)
+  success: '#2B7A3D',
+  warning: '#D9971A',
+  danger: '#C53030',
 
   black: '#000000',
   white: '#FFFFFF',
 } as const;
 
-/** Odstępy (8pt grid — wszystko wielokrotnością 4/8 px dla spójności). */
+/** Odstępy (8pt grid). */
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -52,16 +56,16 @@ export const spacing = {
   xxl: 32,
 } as const;
 
-/** Promienie zaokrągleń — miękki, \"systemowy\" charakter (Apple/Google). */
+/** Promienie zaokrągleń. */
 export const radius = {
   sm: 8,
   md: 12,
   lg: 16,
   xl: 24,
-  pill: 999, // pełne zaokrąglenie (przyciski, chipy)
+  pill: 999,
 } as const;
 
-/** Rozmiary czcionek — skala zbliżona do systemowych dynamic types. */
+/** Rozmiary czcionek. */
 export const fontSize = {
   xs: 12,
   sm: 14,
@@ -72,7 +76,7 @@ export const fontSize = {
   display: 34,
 } as const;
 
-/** Domyślny (ciężki) krój tekstu — encje wagowe inline, bez dodatkowych fontów. */
+/** Wagi (używane w stylach; rodzinę dobiera komponent Text z AppText.tsx). */
 export const fontWeight = {
   regular: '400',
   medium: '500',
@@ -80,19 +84,27 @@ export const fontWeight = {
   bold: '700',
 } as const;
 
-/** Cienie — subtelne uniesienie kafelków (elevation). */
+/** Rodziny czcionek (ładowane w hooks/useAppFonts.ts). */
+export const fonts = {
+  display: 'Fraunces_600SemiBold',
+  regular: 'DMSans_400Regular',
+  medium: 'DMSans_500Medium',
+  semibold: 'DMSans_600SemiBold',
+} as const;
+
+/** Cienie — uniesienie kart. */
 export const shadow = {
   card: {
-    shadowColor: '#1A202C',
+    shadowColor: '#14231F',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
   },
   floating: {
-    shadowColor: '#1A202C',
+    shadowColor: '#14231F',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.18,
     shadowRadius: 12,
     elevation: 6,
   },
