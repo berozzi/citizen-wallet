@@ -5,16 +5,25 @@
  * Wyszukiwanie filtruje po nazwie karty i nazwie sklepu (bez rozróżniania
  * wielkości liter), więc wpisanie "bied" od razu zawęża listę.
  *
+ * Każda karta ma grafikę w kolorach swojej sieci (rozpoznawanej po nazwie
+ * sklepu lub karty). Karty własne dostają neutralny, zielony wygląd.
+ *
  * Dotknięcie kafelka otwiera EKRAN KASOWY (/card/[id]) z kodem do zeskanowania.
+ * Przytrzymanie kafelka pozwala usunąć kartę.
  */
 import React, { useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { CardTile, EmptyState, ScreenContainer } from '@/components';
+import { EmptyState, ScreenContainer } from '@/components';
+import { StoreCard } from '@/components/StoreCard';
+import { brandFromName } from '@/constants/brands';
 import { colors, fontSize, fontWeight, radius, shadow, spacing } from '@/theme/colors';
 import { useCards } from '@/store/CardsContext';
 import { removeScannedBarcodeByValue } from '@/storage/barcodeFile';
+
+// Pusty "kafelek-wypełniacz": gdy kart jest nieparzyście wiele, ostatnia nie rozciąga się na całą szerokość.
+const SPACER = { id: '__spacer__', spacer: true } as const;
 
 export default function CardsScreen() {
   const router = useRouter();
@@ -46,12 +55,20 @@ export default function CardsScreen() {
     );
   }, [cards, query]);
 
+  // Przy nieparzystej liczbie kart dokładamy wypełniacz.
+  const data = useMemo(
+    () => (filtered.length % 2 === 1 ? [...filtered, SPACER] : filtered),
+    [filtered]
+  );
+
   return (
     <ScreenContainer style={styles.root}>
       {/* Nagłówek ekranu */}
       <View style={styles.header}>
         <Text style={styles.title}>Portfel Kart</Text>
-        <Text style={styles.subtitle}>{cards.length} kart w portfelu</Text>
+        <Text style={styles.subtitle}>
+          {cards.length} kart w portfelu · przytrzymaj kartę, aby ją usunąć
+        </Text>
       </View>
 
       {/* Wyszukiwarka */}
@@ -88,21 +105,26 @@ export default function CardsScreen() {
         />
       ) : (
         <FlatList
-          data={filtered}
+          data={data}
           keyExtractor={(item) => item.id}
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <CardTile
-              card={item}
-              variant="grid"
-              style={styles.tile}
-              onPress={() => router.push({ pathname: '/card/[id]', params: { id: item.id } })}
-              onDelete={() => confirmDelete(item.id, item.name, item.barcodeValue)}
-            />
-          )}
+          renderItem={({ item }) =>
+            'spacer' in item ? (
+              <View style={{ flex: 1 }} />
+            ) : (
+              <StoreCard
+                brand={brandFromName(item.storeName) ?? brandFromName(item.name)}
+                name={item.name}
+                chain={item.storeName !== item.name ? item.storeName : undefined}
+                style={styles.tile}
+                onPress={() => router.push({ pathname: '/card/[id]', params: { id: item.id } })}
+                onLongPress={() => confirmDelete(item.id, item.name, item.barcodeValue)}
+              />
+            )
+          }
         />
       )}
 

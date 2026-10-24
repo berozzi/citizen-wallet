@@ -55,11 +55,12 @@ type Props = {
   name?: string; // domyślnie nazwa programu/sieci
   chain?: string;
   onPress?: () => void;
+  onLongPress?: () => void; // np. usuwanie karty
   style?: ViewStyle;
 };
 
 /** Karta lojalnościowa w kolorach sieci (same widoki – wygląda tak samo na każdym telefonie). */
-export function StoreCard({ brand, name, chain, onPress, style }: Props) {
+export function StoreCard({ brand, name, chain, onPress, onLongPress, style }: Props) {
   const def = brand ? BRANDS[brand] : NEUTRAL;
   const title = name ?? def.card ?? def.chain;
   const sub = chain ?? (brand && title !== def.chain ? def.chain : undefined);
@@ -68,6 +69,7 @@ export function StoreCard({ brand, name, chain, onPress, style }: Props) {
       accessibilityRole="button"
       accessibilityLabel={sub ? `${title}, ${sub}` : title}
       onPress={onPress}
+      onLongPress={onLongPress}
       style={({ pressed }) => [s.card, { backgroundColor: def.from, opacity: pressed ? 0.9 : 1 }, style]}>
       <View style={[s.shade, { backgroundColor: def.to }]} />
       <Decor brand={brand} />
