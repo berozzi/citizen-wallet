@@ -86,10 +86,10 @@ export const fontWeight = {
 
 /** Rodziny czcionek (ładowane w hooks/useAppFonts.ts). */
 export const fonts = {
-  display: 'Fraunces_600SemiBold',
-  regular: 'DMSans_400Regular',
-  medium: 'DMSans_500Medium',
-  semibold: 'DMSans_600SemiBold',
+  display: 'DMSerifDisplay_400Regular',
+  regular: 'Lora_400Regular',
+  medium: 'Lora_500Medium',
+  semibold: 'Lora_600SemiBold',
 } as const;
 
 /** Cienie — uniesienie kart. */

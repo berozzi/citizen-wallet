@@ -12,13 +12,14 @@
  * Przytrzymanie kafelka pozwala usunąć kartę.
  */
 import React, { useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { EmptyState, ScreenContainer } from '@/components';
 import { StoreCard } from '@/components/StoreCard';
+import { Text } from '@/components/AppText';
 import { brandFromName } from '@/constants/brands';
-import { colors, fontSize, fontWeight, radius, shadow, spacing } from '@/theme/colors';
+import { colors, fonts, fontSize, fontWeight, radius, shadow, spacing } from '@/theme/colors';
 import { useCards } from '@/store/CardsContext';
 import { removeScannedBarcodeByValue } from '@/storage/barcodeFile';
 
@@ -65,7 +66,7 @@ export default function CardsScreen() {
     <ScreenContainer style={styles.root}>
       {/* Nagłówek ekranu */}
       <View style={styles.header}>
-        <Text style={styles.title}>Portfel Kart</Text>
+        <Text display style={styles.title}>Portfel Kart</Text>
         <Text style={styles.subtitle}>
           {cards.length} kart w portfelu · przytrzymaj kartę, aby ją usunąć
         </Text>
@@ -170,6 +171,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+    fontFamily: fonts.regular,
     fontSize: fontSize.md,
     color: colors.text,
     height: '100%',
