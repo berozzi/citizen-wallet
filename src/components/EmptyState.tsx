@@ -6,7 +6,8 @@
  * użytkownik od razu wie, co ma zrobić.
  */
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 import { PrimaryButton } from './PrimaryButton';

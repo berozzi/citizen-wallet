@@ -5,13 +5,8 @@
  * paragonu, harmonogramu). Łączy etykietę + TextInput + komunikat błędu.
  */
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-} from 'react-native';
+import { StyleSheet, TextInputProps, View } from 'react-native';
+import { Text, TextInput } from '@/components/AppText';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 
 interface FieldProps extends TextInputProps {

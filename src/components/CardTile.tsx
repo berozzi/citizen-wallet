@@ -9,7 +9,8 @@
  * każda karta wygląda jak "swoja" — zgodnie z designem aplikacji.
  */
 import React from 'react';
-import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import type { LoyaltyCard } from '@/types';
 import { findBrand, CUSTOM_BRAND_STYLE } from '@/data/brands';

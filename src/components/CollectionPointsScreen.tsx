@@ -13,15 +13,8 @@
  * komunikat, a lista punktów działa dalej.
  */
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Linking,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { ScreenContainer } from './ScreenContainer';

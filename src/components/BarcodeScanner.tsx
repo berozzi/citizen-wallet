@@ -11,7 +11,8 @@
  * Działa w Expo Go i offline — kamera jest lokalna, nic nie idzie do sieci.
  */
 import React, { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 // W RN 0.86 (SDK 57) alias `StyleSheet.absoluteFillObject` zniknął z typów; dozwolony jest
 // `StyleSheet.absoluteFill` (zwykły obiekt pozycji absolutnej, więc można go rozwinąć).
 import { Ionicons } from '@expo/vector-icons';

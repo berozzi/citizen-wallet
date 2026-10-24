@@ -5,7 +5,8 @@
  * bliski wygaśnięcia, jutrzejszy wywóz śmieci. Kolor i ikona zależą od `tone`.
  */
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 

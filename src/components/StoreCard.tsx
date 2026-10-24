@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Text } from '@/components/AppText';
 import { fonts, radius } from '@/constants/appTheme';
 import { BRANDS, NEUTRAL, type Brand, type Shape } from '@/constants/brands';
 

@@ -5,7 +5,8 @@
  * "Gwarancja", gdy paragon jest pilnowany. Cały wiersz jest klikalny.
  */
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import type { Receipt } from '@/types';
 import { getCategoryMeta } from '@/data/categories';

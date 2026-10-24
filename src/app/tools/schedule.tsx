@@ -9,7 +9,8 @@
  * Przypomnienia można włączać/wyłączać jednym przełącznikiem.
  */
 import React, { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Field, PrimaryButton, ScreenContainer, ScreenHeader } from '@/components';

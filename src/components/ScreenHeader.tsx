@@ -6,7 +6,8 @@
  * przycisk "wstecz", tytuł/podtytuł oraz slot na akcję po prawej stronie.
  */
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors, fontSize, fontWeight, spacing } from '@/theme/colors';

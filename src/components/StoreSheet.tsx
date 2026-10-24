@@ -1,4 +1,5 @@
-import { Image, ImageSourcePropType, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageSourcePropType, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts, radius } from '@/constants/appTheme';

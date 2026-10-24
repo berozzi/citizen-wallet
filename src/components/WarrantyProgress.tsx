@@ -9,7 +9,8 @@
  * Kolor paska bierzemy z poziomu (`level`) wyliczonego w ReceiptsContext.
  */
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 
 interface WarrantyProgressProps {

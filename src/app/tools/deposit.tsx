@@ -9,15 +9,8 @@
  *  - pozwala zeskanować kod kwitu (QR) lub wpisać go ręcznie.
  */
 import React, { useMemo, useState } from 'react';
-import {
-  Alert,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { BarcodeScanner, Field, PrimaryButton, ScreenContainer, ScreenHeader } from '@/components';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';

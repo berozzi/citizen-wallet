@@ -9,14 +9,8 @@
  * kartę "własną". Zapis tworzy nowy wpis w CardsContext (od razu na kokpicie).
  */
 import React, { useMemo, useState } from 'react';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { BarcodeScanner, BarcodeView, Field, PrimaryButton, ScreenContainer, ScreenHeader } from '@/components';

@@ -5,7 +5,8 @@
  * dostaje białe tło z cieniem, reszta pozostaje przezroczysta.
  */
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 
 interface Option<T extends string> {

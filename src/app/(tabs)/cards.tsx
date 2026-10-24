@@ -12,7 +12,8 @@
  * Przytrzymanie kafelka pozwala usunąć kartę.
  */
 import React, { useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { TextInput } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { EmptyState, ScreenContainer } from '@/components';

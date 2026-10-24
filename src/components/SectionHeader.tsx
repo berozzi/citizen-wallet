@@ -5,7 +5,8 @@
  * Po prawej stronie można umieścić link-akcję (np. "Zobacz wszystkie").
  */
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { colors, fontSize, fontWeight, spacing } from '@/theme/colors';
 
 interface SectionHeaderProps {

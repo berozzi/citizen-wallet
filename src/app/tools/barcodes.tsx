@@ -11,7 +11,8 @@
  * (`useFocusEffect`), więc skany z innych ekranów są od razu widoczne.
  */
 import React, { useCallback, useState } from 'react';
-import { Alert, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { EmptyState, PrimaryButton, ScreenContainer, ScreenHeader } from '@/components';
