@@ -12,8 +12,9 @@
  * Pliki są trwałe (katalog `Paths.document` nie jest czyszczony przez system)
  * i przeżywają restart aplikacji.
  *
- * API plików w SDK 57 (nowe, obiektowe):
- *   - `file.write(text): void`     → synchroniczny zapis (tworzy plik),
+ * API plików (nowe, obiektowe):
+ *   - `await file.write(text): Promise<void>` → zapis (tworzy plik),
+ *     (w SDK 58 `write()` jest asynchroniczne; synchroniczny wariant to `writeSync()`)
  *   - `await file.text(): string`  → asynchroniczny odczyt zawartości,
  *   - `file.exists`, `file.delete()`.
  */
@@ -122,8 +123,9 @@ export async function appendScannedBarcode(input: NewScannedBarcode): Promise<Sc
  */
 export async function writeScannedBarcodes(list: ScannedBarcode[]): Promise<void> {
   try {
-    jsonFile().write(JSON.stringify(list, null, 2));
-    txtFile().write(renderTxt(list));
+    // SDK 58: write() zwraca Promise — czekamy, aż oba pliki zostaną zapisane.
+    await jsonFile().write(JSON.stringify(list, null, 2));
+    await txtFile().write(renderTxt(list));
   } catch (err) {
     console.warn('[barcodeFile] Nie udało się zapisać dziennika skanów:', err);
   }
