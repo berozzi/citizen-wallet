@@ -1,14 +1,19 @@
 /**
  * DODAWANIE PARAGONU — /receipt/new (moduł 2).
  * ---------------------------------------------------------------------------
- * Zgodnie z MVP 1.0: zdjęcie paragonu + RĘCZNE wpisanie danych (bez OCR).
+ * Zdjęcie paragonu + OCR (jeśli dostępne) + możliwość ręcznej korekty danych.
  * Formularz pozwala też włączyć pilnowanie gwarancji — wtedy Context wylicza
  * datę końca i planuje powiadomienie 30 dni przed nią.
+ *
+ * UWAGA: OCR korzysta z natywnego modułu `expo-text-extractor`, którego NIE ma
+ * w Expo Go. Dlatego moduł ładujemy leniwie (dynamiczny import) — w Expo Go
+ * ekran nadal działa, a dane wpisuje się ręcznie. Pełny OCR wymaga development
+ * buildu (`npx expo run:ios` / `npx expo run:android` albo EAS Build).
  *
  * Zdjęcie trafia do TRWAŁEGO katalogu aplikacji (kopiujemy je z cache), żeby
  * nie zniknęło po restarcie systemu.
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Image, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,8 +27,28 @@ import { useReceipts } from '@/store/ReceiptsContext';
 import { copyToDocuments } from '@/storage/storage';
 import { startOfToday, formatDate, addMonths } from '@/utils/dates';
 import type { ReceiptCategory } from '@/types';
+import { parseReceipt } from '@/utils/receiptParser';
 
 const WARRANTY_PRESETS = [12, 24, 36, 60];
+
+type OcrModule = typeof import('expo-text-extractor');
+
+/**
+ * Ładuje moduł OCR dopiero przy pierwszym użyciu.
+ * W Expo Go natywny moduł nie istnieje — import kończy się odrzuceniem
+ * obietnicy, które łapiemy, więc ekran działa dalej (tryb ręczny).
+ */
+let ocrModulePromise: Promise<OcrModule | null> | null = null;
+
+function loadOcrModule(): Promise<OcrModule | null> {
+  if (!ocrModulePromise) {
+    ocrModulePromise = import('expo-text-extractor').catch((err) => {
+      console.warn('[receipt/new] OCR niedostępny (np. Expo Go):', err);
+      return null;
+    });
+  }
+  return ocrModulePromise;
+}
 
 export default function NewReceiptScreen() {
   const router = useRouter();
@@ -40,27 +65,78 @@ export default function NewReceiptScreen() {
   const [warrantyMonths, setWarrantyMonths] = useState(24);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  // `null` = jeszcze sprawdzamy, `false` = OCR niedostępne (np. Expo Go).
+  const [ocrAvailable, setOcrAvailable] = useState<boolean | null>(null);
 
-  /** Zrób zdjęcie paragonu aparatem. */
+  // Sprawdzamy dostępność OCR raz, po wejściu na ekran (nie blokuje formularza).
+  useEffect(() => {
+    let active = true;
+    loadOcrModule().then((ocr) => {
+      if (active) setOcrAvailable(Boolean(ocr?.isSupported));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  /** Zapisuje zdjęcie i próbuje odczytać z niego dane (jeśli OCR jest dostępne). */
+  const processPhoto = async (uri: string) => {
+    setPhotoUri(uri);
+
+    const ocr = await loadOcrModule();
+    if (!ocr || !ocr.isSupported) {
+      setOcrAvailable(false);
+      return;
+    }
+    setOcrAvailable(true);
+
+    setScanning(true);
+    try {
+      const lines = await ocr.extractTextFromImage(uri);
+      const parsed = parseReceipt(lines);
+
+      if (parsed.date) setDate(parsed.date.getTime());
+      if (parsed.total !== null) setTotalText(parsed.total.toFixed(2).replace('.', ','));
+
+      const store = parsed.store;
+      if (store) {
+        // Nie nadpisujemy tego, co użytkownik zdążył wpisać ręcznie.
+        setStoreName((prev) => (prev.trim() ? prev : store));
+      }
+    } catch (err) {
+      console.warn('[receipt/new] OCR nie powiódł się:', err);
+      Alert.alert('Błąd OCR', 'Nie udało się odczytać danych z paragonu. Wpisz je ręcznie.');
+    } finally {
+      setScanning(false);
+    }
+  };
+
   const takePhoto = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
       Alert.alert('Brak dostępu', 'Zezwól aplikacji na korzystanie z aparatu w ustawieniach.');
       return;
     }
-    const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
-    if (!result.canceled && result.assets[0]) setPhotoUri(result.assets[0].uri);
+    const result = await ImagePicker.launchCameraAsync({ quality: 1 });
+    if (!result.canceled && result.assets[0]) {
+      await processPhoto(result.assets[0].uri);
+    }
   };
 
-  /** Wybierz zdjęcie z galerii. */
   const pickPhoto = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
       Alert.alert('Brak dostępu', 'Zezwól aplikacji na dostęp do zdjęć w ustawieniach.');
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({ quality: 0.7 });
-    if (!result.canceled && result.assets[0]) setPhotoUri(result.assets[0].uri);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 1,
+    });
+    if (!result.canceled && result.assets[0]) {
+      await processPhoto(result.assets[0].uri);
+    }
   };
 
   const onDateChange = (event: DateTimePickerEvent, selected?: Date) => {
@@ -131,6 +207,14 @@ export default function NewReceiptScreen() {
             </Pressable>
           </View>
         )}
+
+        {scanning ? (
+          <Text style={styles.ocrHint}>Odczytuję dane z paragonu…</Text>
+        ) : ocrAvailable === false ? (
+          <Text style={styles.ocrHint}>
+            OCR działa tylko w development buildzie — w Expo Go dane wpisz ręcznie.
+          </Text>
+        ) : null}
 
         {/* ---------- Dane zakupu ---------- */}
         <Field
@@ -430,6 +514,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     color: colors.primaryDark,
     fontWeight: fontWeight.medium,
+  },
+  ocrHint: {
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.lg,
   },
   notesInput: {
     height: 90,
