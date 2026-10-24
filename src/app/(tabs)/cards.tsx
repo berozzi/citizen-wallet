@@ -8,17 +8,34 @@
  * Dotknięcie kafelka otwiera EKRAN KASOWY (/card/[id]) z kodem do zeskanowania.
  */
 import React, { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { CardTile, EmptyState, ScreenContainer } from '@/components';
 import { colors, fontSize, fontWeight, radius, shadow, spacing } from '@/theme/colors';
 import { useCards } from '@/store/CardsContext';
+import { removeScannedBarcodeByValue } from '@/storage/barcodeFile';
 
 export default function CardsScreen() {
   const router = useRouter();
-  const { cards, isLoading } = useCards();
+  const { cards, isLoading, deleteCard } = useCards();
   const [query, setQuery] = useState('');
+
+  /** Potwierdzenie przed usunięciem — usuwanie jest nieodwracalne. */
+  const confirmDelete = (id: string, name: string, barcodeValue: string) => {
+    Alert.alert('Usunąć kartę?', `Karta „${name}" zostanie trwale usunięta z portfela.`, [
+      { text: 'Anuluj', style: 'cancel' },
+      {
+        text: 'Usuń',
+        style: 'destructive',
+        onPress: () => {
+          void deleteCard(id);
+          // Usuwamy też ślad skanu tej karty z barcodes.json/.txt.
+          void removeScannedBarcodeByValue(barcodeValue);
+        },
+      },
+    ]);
+  };
 
   // Filtrowanie listy po frazie wpisanej w wyszukiwarkę.
   const filtered = useMemo(() => {
@@ -83,6 +100,7 @@ export default function CardsScreen() {
               variant="grid"
               style={styles.tile}
               onPress={() => router.push({ pathname: '/card/[id]', params: { id: item.id } })}
+              onDelete={() => confirmDelete(item.id, item.name, item.barcodeValue)}
             />
           )}
         />

@@ -19,10 +19,12 @@ interface CardTileProps {
   card: LoyaltyCard;
   variant?: 'grid' | 'list';
   onPress: () => void;
+  /** Jeśli podane, w rogu kafelka pojawia się kosz do usunięcia karty. */
+  onDelete?: () => void;
   style?: StyleProp<ViewStyle>;
 }
 
-export function CardTile({ card, variant = 'grid', onPress, style }: CardTileProps) {
+export function CardTile({ card, variant = 'grid', onPress, onDelete, style }: CardTileProps) {
   // Monogram: z katalogu marek; dla kart "własnych" bierzemy pierwszą literę nazwy.
   const brand = findBrand(card.brandId);
   const monogram = brand?.monogram ?? card.storeName.charAt(0).toUpperCase();
@@ -60,7 +62,29 @@ export function CardTile({ card, variant = 'grid', onPress, style }: CardTilePro
     >
       <View style={styles.gridHeader}>
         <Text style={[styles.gridMonogram, { color: foreground }]}>{monogram}</Text>
-        <Ionicons name="chevron-forward" size={18} color={foreground} style={styles.gridChevron} />
+        <View style={styles.gridActions}>
+          {/* Kosz jest osobnym Pressable — dotknięcie go NIE otwiera karty. */}
+          {onDelete ? (
+            <Pressable
+              onPress={onDelete}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel={`Usuń kartę ${card.name}`}
+              style={({ pressed }) => [
+                styles.deleteButton,
+                pressed && styles.deleteButtonPressed,
+              ]}
+            >
+              <Ionicons name="trash-outline" size={15} color={foreground} />
+            </Pressable>
+          ) : null}
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={foreground}
+            style={styles.gridChevron}
+          />
+        </View>
       </View>
       <View>
         <Text style={[styles.gridName, { color: foreground }]} numberOfLines={1}>
@@ -95,6 +119,22 @@ const styles = StyleSheet.create({
   gridMonogram: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
+  },
+  gridActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  deleteButton: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.18)',
+  },
+  deleteButtonPressed: {
+    backgroundColor: 'rgba(0,0,0,0.34)',
   },
   gridChevron: {
     opacity: 0.7,

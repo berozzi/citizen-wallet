@@ -12,6 +12,7 @@
  */
 import React, { useEffect, useRef } from 'react';
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -26,12 +27,13 @@ import { BarcodeView, PrimaryButton } from '@/components';
 import { colors, fontSize, fontWeight, radius, spacing } from '@/theme/colors';
 import { useCards } from '@/store/CardsContext';
 import { groupDigits } from '@/utils/barcode';
+import { removeScannedBarcodeByValue } from '@/storage/barcodeFile';
 
 export default function CardCheckoutScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getCard, markCardUsed } = useCards();
+  const { getCard, markCardUsed, deleteCard } = useCards();
 
   const card = getCard(id);
   // Zapamiętujemy jasność sprzed wejścia, aby ją przywrócić po wyjściu.
@@ -71,6 +73,25 @@ export default function CardCheckoutScreen() {
       </View>
     );
   }
+
+  /** Usunięcie karty z portfela — z potwierdzeniem, bo operacja jest trwała. */
+  const confirmDelete = () => {
+    Alert.alert('Usunąć kartę?', `Karta „${card.name}" zostanie trwale usunięta z portfela.`, [
+      { text: 'Anuluj', style: 'cancel' },
+      {
+        text: 'Usuń',
+        style: 'destructive',
+        onPress: () => {
+          // Najpierw wracamy (ekran nie mignie stanem "nie znaleziono"),
+          // potem usuwamy wpis z kontekstu — lista odświeży się sama.
+          router.back();
+          void deleteCard(id);
+          // Usuwamy też ślad skanu tej karty z barcodes.json/.txt.
+          void removeScannedBarcodeByValue(card.barcodeValue);
+        },
+      },
+    ]);
+  };
 
   // Dla QR rysujemy kwadrat (mniejszy), dla kodów 1D — szeroki pasek.
   const isQr = card.barcodeFormat === 'qr';
@@ -117,9 +138,15 @@ export default function CardCheckoutScreen() {
         </View>
       </ScrollView>
 
-      {/* Dolny pasek: duży przycisk Zamknij */}
+      {/* Dolny pasek: duży przycisk Zamknij + usuwanie karty */}
       <View style={styles.footer}>
         <PrimaryButton label="Zamknij" onPress={() => router.back()} />
+        <PrimaryButton
+          label="Usuń kartę"
+          icon="trash-outline"
+          variant="danger"
+          onPress={confirmDelete}
+        />
       </View>
     </View>
   );
@@ -211,5 +238,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.white,
+    gap: spacing.sm,
   },
 });

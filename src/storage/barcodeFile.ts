@@ -151,3 +151,20 @@ function renderTxt(list: ScannedBarcode[]): string {
   });
   return header + (lines.length ? lines.join('\n') + '\n' : '');
 }
+
+/**
+ * Usuń z dziennika skanów wpisy o podanej wartości kodu.
+ * Używane przy usuwaniu karty — żeby jej ślad zniknął też z barcodes.json/.txt.
+ * Zwraca liczbę usuniętych wpisów (0, gdy nic nie pasowało).
+ */
+export async function removeScannedBarcodeByValue(value: string): Promise<number> {
+  const v = value.trim();
+  if (!v) return 0;
+  const list = await readScannedBarcodes();
+  const filtered = list.filter((b) => b.value.trim() !== v);
+  const removed = list.length - filtered.length;
+  if (removed > 0) {
+    await writeScannedBarcodes(filtered);
+  }
+  return removed;
+}

@@ -1,34 +1,23 @@
-import { useState } from 'react';
-import { ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '@/constants/appTheme';
 import { Button, Card, IconChip } from '@/components/ui';
 import { AdSlot } from '@/components/AdSlot';
-import { StoreCard, type Brand } from '@/components/StoreCard';
-import { StoreSheet } from '@/components/StoreSheet';
-
-// Oficjalne logotypy: wrzuć pliki do /assets i odkomentuj (ścieżka względem tego pliku).
-const LOGOS: Partial<Record<Brand, ImageSourcePropType>> = {
-  // biedronka: require('../../assets/biedronka.png'),
-  // lidl: require('../../assets/lidl.png'),
-};
+import { StoreCard } from '@/components/StoreCard';
+import { brandFromName } from '@/constants/brands';
+import { useCards } from '@/store/CardsContext';
 
 export default function Kokpit() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [brand, setBrand] = useState<Brand>('biedronka');
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const openSheet = (b: Brand) => {
-    setBrand(b);
-    setSheetOpen(true);
-  };
+  const { cards } = useCards();
 
   // TODO: podmień na swoje dane (store / AsyncStorage)
   const data = {
     name: 'Jan',
-    cards: 2,
+    cards: cards.length,
     spent: '132,47 zł',
     bottles: 33,
     warranties: 1,
@@ -76,32 +65,48 @@ export default function Kokpit() {
           <Text style={s.link}>Wszystkie</Text>
         </Pressable>
       </View>
-      <View style={s.row}>
-        <StoreCard brand="biedronka" name="Moja Biedronka" chain="Biedronka" onPress={() => openSheet('biedronka')} />
-        <StoreCard brand="lidl" name="Lidl Plus" chain="Lidl" onPress={() => openSheet('lidl')} />
-      </View>
+      {cards.length === 0 ? (
+        <Card style={s.empty}>
+          <Text style={s.emptyText}>Nie masz jeszcze żadnej karty lojalnościowej.</Text>
+          <Button label="Dodaj pierwszą kartę" icon="plus" onPress={() => router.push('/card/new')} />
+        </Card>
+      ) : (
+        <View style={s.row}>
+          {cards.slice(0, 2).map((card) => (
+            <StoreCard
+              key={card.id}
+              brand={brandFromName(card.storeName)}
+              name={card.name}
+              chain={card.storeName}
+              onPress={() =>
+                router.push({ pathname: '/card/[id]', params: { id: card.id } })
+              }
+            />
+          ))}
+        </View>
+      )}
 
       {/* Reklama 2 – natywna */}
       <AdSlot variant="native" title="[NAZWA PARTNERA]" />
 
       <View style={s.row}>
-        <Button label="Dodaj kartę" icon="plus" style={{ flex: 1 }} onPress={() => router.push('/card/new')} />
-        <Button label="Dodaj paragon" icon="camera" variant="outline" style={{ flex: 1 }} onPress={() => router.push('/receipt/new')} />
+        <Button
+          label="Dodaj kartę"
+          icon="plus"
+          style={{ flex: 1 }}
+          onPress={() => router.push('/card/new')}
+        />
+        <Button
+          label="Dodaj paragon"
+          icon="camera"
+          variant="outline"
+          style={{ flex: 1 }}
+          onPress={() => router.push('/receipt/new')}
+        />
       </View>
 
       {/* Reklama 3 – pasek na dole */}
       <AdSlot variant="strip" />
-
-      <StoreSheet
-        brand={brand}
-        visible={sheetOpen}
-        logo={LOGOS[brand]}
-        onClose={() => setSheetOpen(false)}
-        onOpenCard={() => {
-          setSheetOpen(false);
-          router.push('/cards');
-        }}
-      />
     </ScrollView>
   );
 }
@@ -121,4 +126,6 @@ const s = StyleSheet.create({
   section: { fontFamily: fonts.display, fontSize: 20, color: colors.ink },
   link: { fontFamily: fonts.semibold, fontSize: 14, color: colors.primary },
   row: { flexDirection: 'row', gap: 12 },
+  empty: { padding: 16, gap: 12 },
+  emptyText: { fontFamily: fonts.regular, fontSize: 14, color: colors.muted },
 });

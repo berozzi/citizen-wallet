@@ -78,7 +78,10 @@ export default function NewCardScreen() {
     });
   };
 
-  const canSave = barcodeValue.trim().length > 0 && (storeName.trim().length > 0 || name.trim().length > 0);
+  // Do zapisu wystarczy sam kod — nazwę i sklep uzupełniamy sensownymi
+  // domyślnymi wartościami w handleSave. Wcześniej wymagaliśmy też nazwy/sklepu,
+  // przez co przycisk bywał zablokowany i wyglądało to jak "nie da się dodać".
+  const canSave = barcodeValue.trim().length > 0;
 
   const handleSave = async () => {
     if (!canSave) return;
@@ -94,7 +97,10 @@ export default function NewCardScreen() {
       barcodeFormat,
     });
     setSaving(false);
-    router.back();
+    // Wracamy tam, skąd przyszliśmy. Gdyby nie było historii (np. deep link),
+    // otwieramy listę kart, żeby użytkownik zobaczył nową pozycję.
+    if (router.canGoBack()) router.back();
+    else router.replace('/cards');
   };
 
   return (
